@@ -1,6 +1,7 @@
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 
+from django.db import transaction
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection as db_connection
@@ -142,11 +143,14 @@ def send(recipients=None, sender=None, template=None, context=None, subject='',
 
     email = create(sender, recipients, cc, bcc, subject, message, html_message,
                    context, scheduled_time, headers, template, priority,
-                   render_on_delivery, commit=commit, backend=backend)
+                   render_on_delivery, commit=False, backend=backend)
 
-    if attachments:
-        attachments = create_attachments(attachments)
-        email.attachments.add(*attachments)
+    if commit:
+        with transaction.atomic():
+            email.save()
+            if attachments:
+                attachments = create_attachments(attachments)
+                email.attachments.add(*attachments)
 
     if priority == PRIORITY.now:
         email.dispatch(log_level=log_level)
