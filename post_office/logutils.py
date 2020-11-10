@@ -1,5 +1,9 @@
 import logging
 from logging.config import dictConfig
+from .settings import get_use_raven
+
+
+__all__ = ['setup_loghandlers', 'capcure_exception']
 
 
 # Taken from https://github.com/nvie/rq/blob/master/rq/logutils.py
@@ -34,3 +38,9 @@ def setup_loghandlers(level=None):
             }
         })
     return logger
+
+
+def capcure_exception():
+    if get_use_raven():
+        from raven.contrib.django.raven_compat.models import client
+        client.captureException()

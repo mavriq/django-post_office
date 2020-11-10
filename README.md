@@ -699,6 +699,18 @@ LOGGING = {
 }
 ```
 
+#### Use raven to log errors on sending email
+
+If you use raven on your project, you can enable them to log email sending errors.
+This option enabling automatically if `raven` is installed.
+
+To disable this option you must set
+```python
+POST_OFFICE = {
+    'USE_RAVEN': False,
+}
+```
+
 ### Threads
 
 `post-office` >= 3.0 allows you to use multiple threads to dramatically

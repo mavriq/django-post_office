@@ -124,6 +124,18 @@ def get_message_id_fqdn():
     return get_config().get('MESSAGE_ID_FQDN', DNS_NAME)
 
 
+def get_use_raven():
+    _use_raven = get_config().get('USE_RAVEN', None)
+    if _use_raven is None:
+        try:
+            import raven
+        except ImportError:
+            _use_raven = False
+        else:
+            _use_raven = True
+    return _use_raven
+
+
 CONTEXT_FIELD_CLASS = get_config().get('CONTEXT_FIELD_CLASS',
                                        'jsonfield.JSONField')
 context_field_class = import_string(CONTEXT_FIELD_CLASS)

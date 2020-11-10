@@ -9,7 +9,7 @@ from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 
 from .connections import connections
-from .logutils import setup_loghandlers
+from .logutils import setup_loghandlers, capcure_exception
 from .models import Email, EmailTemplate, Log, PRIORITY, STATUS
 from .settings import (
     get_available_backends, get_batch_size, get_log_level, get_max_retries, get_message_id_enabled,
@@ -259,6 +259,7 @@ def _send_bulk(emails, uses_multiprocessing=True, log_level=None):
             logger.debug('Successfully sent email #%d' % email.id)
         except Exception as e:
             logger.debug('Failed to send email #%d' % email.id)
+            capcure_exception()
             failed_emails.append((email, e))
 
     # Prepare emails before we send these to threads for sending
@@ -269,6 +270,7 @@ def _send_bulk(emails, uses_multiprocessing=True, log_level=None):
         try:
             email.prepare_email_message()
         except Exception as e:
+            capcure_exception()
             failed_emails.append((email, e))
 
     number_of_threads = min(get_threads_per_process(), email_count)
